@@ -87,16 +87,18 @@ public class SetRegion {
 
 	//Generate subsets for each region in SetRegion, and return it all in an Array
 	//Equivalent to Figure 6, Line 26
-	/*public ArrayList<SetRegion> generateSubsets  (){
+	public ArrayList<SetRegion> generateSubsets(){
 		ArrayList<SetRegion> allSubsets = new ArrayList<SetRegion>();
 
-		for(Region theta: this.arrayOfRegions){
+		/*for(Region theta: this.arrayOfRegions){
 			//Create all possible subsets of examples within theta
 			ArrayList<String> positiveExamples = theta.getPositiveRegions();
 
 	        allSubsets.add(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
-		}
-	}*/
+		}*/
+		
+		return allSubsets;
+	}
 
 	public void setProgramsN1  (ArrayList<Program> inPrograms) {
 	    this.programsN1 = inPrograms;

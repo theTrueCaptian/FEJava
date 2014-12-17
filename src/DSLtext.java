@@ -85,7 +85,7 @@ public class DSLtext {
 			if (learnedProgs.length > 0) {
 				for (Program prog : learnedProgs) {
 					MiscUtil.logLearn(Program.debug);
-					MiscUtil.logLearn(prog.execute(document.getDocument()));
+					MiscUtil.logLearn(prog.execute(document.getDocument()).toString());
 
 				}
 

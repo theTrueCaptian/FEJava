@@ -37,34 +37,34 @@ public class N1Learn {
 	 */
 	public Program[] MergeLearn(GlobalDocument document, SetRegion input){
 
-	    Util.logTime(0, "START: MergeLearn()")
+	    MiscUtil.logTime(0, "START: MergeLearn()");
 
 	    /* We have organized it so that the positive regions are the ones we extract and inRegion is
 	     * the ancestor region to extract these positive region from
 	     */
-	    var Thetas = input
+	    SetRegion Thetas = input;
 
 	    /* All that parts in inRegion that we will form partitions on
 	     * This is the Y from Figure 6. Line 27
 	     */
-	    var positiveTotal = Thetas.getAllPositiveExamples()
+	    ArrayList<String> positiveTotal = Thetas.getAllPositiveExamples();
 
 	    /* Generate subsets for each region in SetRegion
 	     * (We make subsets of theta1 and theta2)
 	     */
-	    var allSubsets = Thetas.generateSubsets()
+	    //ArrayList<SetRegion> allSubsets = Thetas.generateSubsets();
 
 	    //Create subsets of allSubsets[], and we call this X[]
-	    var X = generateAllSubset(allSubsets)
+	    //var X = generateAllSubset(allSubsets)
 
 	    //Filter and generate programs
-	    var m = input.getRegionCount()
-	    var filtered = filterX(X, positiveTotal, m);
+	    //var m = input.getRegionCount()
+	    //var filtered = filterX(X, positiveTotal, m);
 
 
 	    //Learn programs for the filtered X's
-	    learnX(filtered, document, input, positiveTotal, callback)
-
+	    //learnX(filtered, document, input, positiveTotal, callback)
+	    return null;
 	}
 	
 	class SearchThread implements Runnable {
