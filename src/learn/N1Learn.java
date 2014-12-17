@@ -7,6 +7,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+
+import program.*;
+import region.*;
+import utilsFE.*;
 /*
  * Maeda Hanafi
  * N1Learn.java learns N1 programs; Spawns threads
@@ -24,7 +28,45 @@ for (int i = 0; i < urls.size(); i++) {
 }*/
 public class N1Learn {
 	private final int NTHREDS = 10;
+	
+	/********************************************************************************
+	 Learning Function for Merge operator: MergeLearn
+	 ********************************************************************************/
+	/* @document is a String of the whole document
+	 * @input is an Array of Regions
+	 */
+	public Program[] MergeLearn(GlobalDocument document, SetRegion input){
 
+	    Util.logTime(0, "START: MergeLearn()")
+
+	    /* We have organized it so that the positive regions are the ones we extract and inRegion is
+	     * the ancestor region to extract these positive region from
+	     */
+	    var Thetas = input
+
+	    /* All that parts in inRegion that we will form partitions on
+	     * This is the Y from Figure 6. Line 27
+	     */
+	    var positiveTotal = Thetas.getAllPositiveExamples()
+
+	    /* Generate subsets for each region in SetRegion
+	     * (We make subsets of theta1 and theta2)
+	     */
+	    var allSubsets = Thetas.generateSubsets()
+
+	    //Create subsets of allSubsets[], and we call this X[]
+	    var X = generateAllSubset(allSubsets)
+
+	    //Filter and generate programs
+	    var m = input.getRegionCount()
+	    var filtered = filterX(X, positiveTotal, m);
+
+
+	    //Learn programs for the filtered X's
+	    learnX(filtered, document, input, positiveTotal, callback)
+
+	}
+	
 	class SearchThread implements Runnable {
 		String executeURL, search;
 
