@@ -1,6 +1,8 @@
 package region;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import utilsFE.MiscUtil;
 /********************************************************************************
 Region class/module
@@ -9,7 +11,7 @@ Region class/module
 public class Region {
 	private String region = null;
 	private ArrayList<Integer> positiveRegionIndices = null,
-			negativeRegionIndices = null;
+								negativeRegionIndices = null;
 	private ArrayList<String> positiveRegions = null, negativeRegions = null;
 
 	private ArrayList<String> regionLines = null;
@@ -34,6 +36,20 @@ public class Region {
 		this.negativeRegions = negativeRegions;
 		this.positiveRegionIndices = positiveRegionIndices;
 		this.negativeRegionIndices = negativeRegionIndices;
+
+		// regionLines is region divided by lines
+		this.regionLines = MiscUtil.splitAndRetainByNewline(this.region);
+	}
+	
+	public Region(String region, Integer[] positiveRegionIndices,
+			String[] positiveRegions,
+			Integer[] negativeRegionIndices,
+			String[] negativeRegions) {
+		this.region = region;
+		this.positiveRegions = new ArrayList<String>(Arrays.asList(positiveRegions)); 
+		this.negativeRegions = new ArrayList<String>(Arrays.asList(negativeRegions)); 
+		this.positiveRegionIndices = new ArrayList<Integer>(Arrays.asList(positiveRegionIndices)); 
+		this.negativeRegionIndices = new ArrayList<Integer>(Arrays.asList(negativeRegionIndices));
 
 		// regionLines is region divided by lines
 		this.regionLines = MiscUtil.splitAndRetainByNewline(this.region);

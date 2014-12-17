@@ -1,5 +1,9 @@
 package region;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Set;
+
+import com.google.common.collect.*;
 
 import program.Program;
 import region.*;
@@ -13,6 +17,11 @@ public class SetRegion {
 	
 	public SetRegion(ArrayList<Region> inArray, ArrayList<Program> programsN1, ArrayList<Program> programsN2) {
 	    this.arrayOfRegions = inArray;
+	    this.programsN1 = programsN1;
+	    this.programsN2 = programsN2;
+	}
+	public SetRegion(Region[] inArray, ArrayList<Program> programsN1, ArrayList<Program> programsN2) {
+	    this.arrayOfRegions = new ArrayList<Region>(Arrays.asList(inArray));
 	    this.programsN1 = programsN1;
 	    this.programsN2 = programsN2;
 	}
@@ -78,16 +87,16 @@ public class SetRegion {
 
 	//Generate subsets for each region in SetRegion, and return it all in an Array
 	//Equivalent to Figure 6, Line 26
-	public ArrayList<SetRegion> generateSubsets  (){
+	/*public ArrayList<SetRegion> generateSubsets  (){
 		ArrayList<SetRegion> allSubsets = new ArrayList<SetRegion>();
 
 		for(Region theta: this.arrayOfRegions){
 			//Create all possible subsets of examples within theta
 			ArrayList<String> positiveExamples = theta.getPositiveRegions();
 
-	        allSubsets.addAll(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
+	        allSubsets.add(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
 		}
-	}
+	}*/
 
 	public void setProgramsN1  (ArrayList<Program> inPrograms) {
 	    this.programsN1 = inPrograms;
@@ -103,9 +112,14 @@ public class SetRegion {
 	    return this.programsN2;
 	}
 
-	private ArrayList<SetRegion> generateAllSubsetRegion(Region regionString , ArrayList<String> array) {
-	    var cmb, a;
-	    ArrayList<SetRegion> result = new ArrayList<SetRegion>();
+	/*
+	 * @array is an array of positiveExamples of type String
+	 */
+	/*private SetRegion generateAllSubsetRegion(String regionString , Set<String> array) {
+		//Set<Set<String>> cmb = Collections2.powerSet(array);
+		/*Set<Set<SetRegion>> cmb;
+		Set<SetRegion> a;
+	    Set<SetRegion> result = new Set<SetRegion>();
 	    cmb = Combinatorics.power(array);
 	    cmb.forEach(function(a){ 
 	        //Create a Region object from a
@@ -123,19 +137,19 @@ public class SetRegion {
 	        result.push(region)
 	    });
 	    return result;
-	}
+	}*/
 
 
-	public void toString() {
-	    var str = ""
-	    this.arrayOfRegions.forEach(function(region){
-	        str = str + region.toString()+", "
-	    })
+	public String toString() {
+	    String str = "";
+	    for(Region region: this.arrayOfRegions){//this.arrayOfRegions.forEach(function(region){
+	        str = str + region.toString()+", ";
+	    }
 	    return "SetRegion(" + str + ")";
 	};
 
 	//This function turns an object instance into an object literal
-	public void obj() {
+	/*public void obj() {
 	    var arrayOfRegions = _.map(this.arrayOfRegions, function(region){
 	        //return an obj
 	        return region.obj()
@@ -156,5 +170,5 @@ public class SetRegion {
 	            'programsN1':programsN1,
 	            'programsN2':programsN2
 	    }
-	}
+	}*/
 }
