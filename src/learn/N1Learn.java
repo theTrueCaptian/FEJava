@@ -6,11 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.List;
 import java.util.ArrayList;
 
 import program.*;
 import region.*;
 import utilsFE.*;
+
+import com.google.common.collect.*;
 /*
  * Maeda Hanafi
  * N1Learn.java learns N1 programs; Spawns threads
@@ -47,12 +50,12 @@ public class N1Learn {
 	    /* All that parts in inRegion that we will form partitions on
 	     * This is the Y from Figure 6. Line 27
 	     */
-	    ArrayList<String> positiveTotal = Thetas.getAllPositiveExamples();
+	    List<String> positiveTotal = Thetas.getAllPositiveExamples();
 
 	    /* Generate subsets for each region in SetRegion
 	     * (We make subsets of theta1 and theta2)
 	     */
-	    //ArrayList<SetRegion> allSubsets = Thetas.generateSubsets();
+	    ArrayList<Region> allSubsets = (ArrayList<Region>) Thetas.generateSubsets();
 
 	    //Create subsets of allSubsets[], and we call this X[]
 	    //var X = generateAllSubset(allSubsets)

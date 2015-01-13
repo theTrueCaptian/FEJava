@@ -2,10 +2,41 @@ package utilsFE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import region.Region;
+import region.Text;
 
 public class MiscUtil {
+	
 	static private boolean isConsoleLog = true;
 
+	//Given a set of Texts, convert each Text into a Region
+	//Returns a list of regions
+	public static ArrayList<Region> createRegion(Set<Text> setText){
+		ArrayList<Region> listRegion = new ArrayList<Region>();
+		System.out.println("Create Region");
+		System.out.println(setText);
+		
+		Iterator itr = setText.iterator();
+		while(itr.hasNext()) {
+			Object textElem = itr.next();
+			
+			//Create Region object from element
+			//Region regionElement = convertToTextObj(textElem);
+			
+			//listRegion.add(regionElement);
+		}
+		return listRegion;
+	}
+	
+	//@inText is the text to convert to Region
+	//public static Region convertToTextObj(Text inText){
+	//	return new Region();
+	//}
+	
 	// Given a string, return an ArrayList<String> split by newline, and making
 	// sure to retain the newline
 	public static ArrayList<String> splitAndRetainByNewline(String string) {
@@ -40,8 +71,8 @@ public class MiscUtil {
 		if (isLogTime) {
 			long date = System.currentTimeMillis() / 1000;
 			if (isConsoleLog) {
-				// System.out.println(date + "\t" +
-				// jsStringEscape(functionString));
+				 System.out.println(date + "\t" +
+						 /*jsStringEscape*/(functionString));
 			}
 			// loggedTimes.add(new LoggedTime(ID,
 			// jsStringEscape(functionString), date));
@@ -146,7 +177,7 @@ public class MiscUtil {
 
 		if (isLogLearn) {
 			if (isConsoleLog) {
-				// System.out.println(jsStringEscape(message));
+				System.out.println(/*jsStringEscape*/(message));
 			}
 			loggedLearnedMessages.add(/* jsStringEscape */(message));
 

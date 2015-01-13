@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 import region.*;
 import learn.*;
 import program.*;
@@ -37,17 +40,33 @@ public class DSLtext {
 			// Here are the positive examples to extract from the blues:
 			String pos1 = "proteins (600)\n";
 			String pos2 = "proteins (102)\n";
-			String pos3 = "proteins (01)\n";
+			//String pos3 = "proteins (01)\n";
 
+			//Here is a region
+			Region region1 = new Region(
+					blueregion1, new Integer[] { 
+							blueregion1.indexOf(pos1),
+							blueregion1.indexOf(pos2)
+					}, new String[] { 
+							pos1,
+							pos2 
+					}, null, null
+			); 
+			
 			// We form the array of regions to be sent to Merge.Learn
 			// Algorithm 2, line 6: The regions in the array must contain
 			// positive examples, or else those regions that don't will not be
 			// learned upon
-			SetRegion input = new SetRegion(new Region[] { new Region(
-					blueregion1, new Integer[] { blueregion1.indexOf(pos1),
+			List<Region> regionList = new ArrayList<Region>();
+			regionList.add(region1);
+			SetRegion input = new SetRegion(regionList, null, null);
+			/*SetRegion input = new SetRegion(new Region[] 
+					{ new Region(
+							blueregion1, new Integer[] { blueregion1.indexOf(pos1),
 							blueregion1.indexOf(pos2),
 							blueregion1.indexOf(pos3) }, new String[] { pos1,
-							pos2, pos3 }, null, null) }, null, null);
+							pos2, pos3 }, null, null) 
+					}, null, null);*/
 
 			run(input, document);
 		}
@@ -82,7 +101,7 @@ public class DSLtext {
 
 			MiscUtil.logLearn("Done Learning!");
 
-			if (learnedProgs.length > 0) {
+			/*if (learnedProgs.length > 0) {
 				for (Program prog : learnedProgs) {
 					MiscUtil.logLearn(Program.debug);
 					MiscUtil.logLearn(prog.execute(document.getDocument()).toString());
@@ -90,7 +109,7 @@ public class DSLtext {
 				}
 
 				// callback(learnedProgs[0].execute(document.getDocument()))
-			}
+			}*/
 
 			// Util.writeLogTimeToFile()
 			// Util.writeLogLearnedToFile()
