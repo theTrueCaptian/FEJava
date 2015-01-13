@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+
 import region.Region;
 import region.Text;
 
@@ -188,4 +191,12 @@ public class MiscUtil {
 		// FileIO.writeToFile("loglearn.txt",
 		// FileIO.toString(loggedLearnedMessages ))
 	}
+	
+	public static String escape(String inString){
+		Escaper myEscaper = Escapers.builder()
+			.addEscape('\n', "\\n")
+			.build();
+		return myEscaper.escape(inString);
+	}
+
 }

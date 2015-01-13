@@ -10,10 +10,10 @@ Region class/module
 ********************************************************************************/
 public class Region {
 	private String region = null;
-	private ArrayList<Integer> positiveRegionIndices = null,
+	/*private ArrayList<Integer> positiveRegionIndices = null,
 								negativeRegionIndices = null;
 	private ArrayList<String> positiveRegionsString = null, negativeRegionsString = null;
-
+	*/
 	private ArrayList<String> regionLines = null;
 	
 	private ArrayList<Text> positiveRegions = null;
@@ -35,15 +35,15 @@ public class Region {
 			ArrayList<String> negativeRegionsString) {
 		
 		if(region!=null) this.region = region;
-		if(positiveRegionsString!=null) this.positiveRegionsString = positiveRegionsString;
+		/*if(positiveRegionsString!=null) this.positiveRegionsString = positiveRegionsString;
 		if(negativeRegionsString!=null) this.negativeRegionsString = negativeRegionsString;
 		if(positiveRegionIndices!=null) this.positiveRegionIndices = positiveRegionIndices;
 		if(negativeRegionIndices!=null) this.negativeRegionIndices = negativeRegionIndices;
-
+*/
 		// regionLines is region divided by lines
 		if(region!=null) this.regionLines = MiscUtil.splitAndRetainByNewline(this.region);
 
-		this.positiveRegions = formTextArray();
+		this.positiveRegions = formTextArray(positiveRegionsString, positiveRegionIndices);
 	}
 	
 	public Region(String region, Integer[] positiveRegionIndices,
@@ -51,23 +51,32 @@ public class Region {
 			Integer[] negativeRegionIndices,
 			String[] negativeRegionsString) {
 		if(region!=null) this.region = region;
-		if(positiveRegionsString!=null) this.positiveRegionsString = new ArrayList<String>(Arrays.asList(positiveRegionsString)); 
+		/*if(positiveRegionsString!=null) this.positiveRegionsString = new ArrayList<String>(Arrays.asList(positiveRegionsString)); 
 		if(negativeRegionsString!=null) this.negativeRegionsString = new ArrayList<String>(Arrays.asList(negativeRegionsString)); 
 		if(positiveRegionIndices!=null) this.positiveRegionIndices = new ArrayList<Integer>(Arrays.asList(positiveRegionIndices)); 
 		if(negativeRegionIndices!=null) this.negativeRegionIndices = new ArrayList<Integer>(Arrays.asList(negativeRegionIndices));
-
+*/
 		// regionLines is region divided by lines
 		if(region!=null) this.regionLines = MiscUtil.splitAndRetainByNewline(this.region);
 	
-		this.positiveRegions = formTextArray();
+		this.positiveRegions = formTextArray(new ArrayList<String>(Arrays.asList(positiveRegionsString)), 
+											 new ArrayList<Integer>(Arrays.asList(positiveRegionIndices)));
+	}
+	
+	//Create a Region object from an ArrayList of Texts
+	public Region(String region, ArrayList<Text> positiveRegions){
+		if(region!=null) this.region = region;
+		// regionLines is region divided by lines
+		if(region!=null) this.regionLines = MiscUtil.splitAndRetainByNewline(this.region);
+		this.positiveRegions = positiveRegions ;
 	}
 
 	//Forms an array of text given the data set in the constructor
-	private ArrayList<Text> formTextArray(){
+	private ArrayList<Text> formTextArray(ArrayList<String> positiveRegionsString, ArrayList<Integer> positiveRegionIndices){
 		ArrayList<Text> positiveRegions = new ArrayList<Text>();
 		//Iterate over positiveRegionsString and convert the information into Texts
-		for(int i=0; i<this.positiveRegionsString.size(); i++){
-			positiveRegions.add(new Text("", this.positiveRegionsString.get(i), this.positiveRegionIndices.get(i)));
+		for(int i=0; i<positiveRegionsString.size(); i++){
+			positiveRegions.add(new Text( positiveRegionsString.get(i), positiveRegionIndices.get(i)));
 		}
 		return positiveRegions;
 	}
@@ -83,19 +92,21 @@ public class Region {
 	}
 		
 	// Returns an arraylist of strings of positive regions, e.g. ["protiends", ...]
-	public ArrayList<String> getPositiveRegionsString() {
+	/*public ArrayList<String> getPositiveRegionsString() {
 		return this.positiveRegionsString;
 	}
 
 	public ArrayList<String> getNegativeRegionsString() {
 		return this.negativeRegionsString;
 	}
-
+	*/
+	
 	// Returns the number of positive regions
 	public int getPositiveRegionsCount() {
-		return this.positiveRegionsString.size();
+		return this.positiveRegions.size();
 	}
 
+	/*
 	// Returns an array of positive regions in string
 	public ArrayList<Integer> getPositiveIndices() {
 		return this.positiveRegionIndices;
@@ -114,9 +125,9 @@ public class Region {
 	 * Given index, return the positive index from positiveRegionIndices array
 	 * So the return is the location of postive example number, index
 	 */
-	public int getPositiveIndexOf(int index) {
+	/*public int getPositiveIndexOf(int index) {
 		return this.positiveRegionIndices.get(index);
-	}
+	}*/
 
 	// Return the whole region divided by lines in an array
 	public ArrayList<String> getRegionLines() {
@@ -134,10 +145,8 @@ public class Region {
 	 */
 
 	public String toString() {
-		return "Region(" + this.region + ", " + this.positiveRegionIndices
-				+ ", " + this.positiveRegionsString + ", "
-				+ this.negativeRegionIndices + ", " + this.negativeRegionsString
-				+ ")";
+		return MiscUtil.escape("Region("/* + this.region + ", " */+ this.positiveRegions
+				+ ")");
 	};
 
 	/*

@@ -1,5 +1,6 @@
 package region;
 import java.util.ArrayList;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+import com.google.common.escape.CharEscaper;
 
 import program.Program;
 import region.*;
@@ -26,15 +28,12 @@ public class SetRegion {
 	    this.programsN2 = programsN2;
 	}
 	
-	/*public SetRegion(ArrayList<Text> arrayOfRegions){
-		this
-	}
-	/*public ListRegion(Region[] inArray, List<Program> programsN1, List<Program> programsN2) {
-	    this.arrayOfRegions = new ArrayList<Region>(Arrays.asList(inArray));
+	public SetRegion(ArrayList<Region> inArray, List<Program> programsN1, List<Program> programsN2) {
+	    this.arrayOfRegions = inArray;
 	    this.programsN1 = programsN1;
 	    this.programsN2 = programsN2;
-	}*/
-
+	}
+	
 	//Returns the number of Regions in the List
 	public List<Region> getListRegions  (){
 	    return this.arrayOfRegions;
@@ -69,7 +68,7 @@ public class SetRegion {
 
 	//Checks if the List contains multiple regions that are the same
 	public boolean isRegionsUnique(){
-	    List<Region> allRegions = new ArrayList<Region>();
+	    List<Region> allRegions = this.arrayOfRegions;
 	    //Loop through all Regions, and then check against the other regions
 	    for(int i=0; i<allRegions.size(); i++){
 	    	for(int j=0; j<allRegions.size(); j++){
@@ -84,11 +83,11 @@ public class SetRegion {
 	}
 
 	//Given an array of regions, return all the positive examples from every single region in one Array
-	public List<String> getAllPositiveExamples(){
-		List<String> positives = new ArrayList<String>();
+	public List<Text> getAllPositiveExamples(){
+		List<Text> positives = new ArrayList<Text>();
 		for(Region region: this.arrayOfRegions){
 			//Accumulate all the positives of each Region into positives[]
-			positives.addAll(region.getPositiveRegionsString());
+			positives.addAll(region.getPositiveRegions());
 		}
 		return positives;
 
@@ -96,36 +95,17 @@ public class SetRegion {
 
 	/* Generate subsets for each region in SetRegion, and return it all in an Array
 	 * Equivalent to Figure 6, Line 26
-	 * Returns an array of regions e.g. [Region(posRegion[0]...), Region(posRegion[1]...) ...]
+	 * Returns an array of regions e.g. [Region("proteins (600)"), Region("proteins (600)", "proteins (102)") ...]
 	 */
 	public List<Region> generateSubsets(){
-		List<Region> allSubList = new ArrayList<Region>();
-		//generateAllSubListRegion(String regionString , List<String> array);
+		List<Region> allSubsets = new ArrayList<Region>();
 		
-		//var allSubList = []
-
-	    //this.arrayOfRegions.forEach(function(theta){
 		for(Region theta: this.arrayOfRegions){
 			//Create all possible subList of examples within theta
-			//List<String> positiveExamples = theta.getPositiveRegions();
-	
-			//System.out.print(theta.getRegion());
-			//System.out.print(positiveExamples);
-			//System.out.println("---------------------------");
-	        //allSubList = allSubList.concat(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
-			//allSubList.add(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
-			generateAllSubsetRegion(theta.getRegionString(), theta.getPositiveRegions());
-		}//})
-	    return allSubList;
+			allSubsets.addAll( generateAllSubsetRegion(theta.getRegionString(), theta.getPositiveRegions()));
+		}
+	    return allSubsets;
 		
-		/*for(Region theta: this.arrayOfRegions){
-			//Create all possible subList of examples within theta
-			List<String> positiveExamples = theta.getPositiveRegions();
-
-	        allSubList.add(generateAllSubsetRegion(theta.getRegion(), positiveExamples));
-		}*/
-		
-		//return allSubList;
 	}
 
 	public void ListProgramsN1  (List<Program> inPrograms) {
@@ -146,52 +126,33 @@ public class SetRegion {
 	 * @array is an array of positiveExamples of type String e.g. ["proteins (200)", ...]
 	 * @return 
 	 */
-	private List<SetRegion> generateAllSubsetRegion(String regionString , ArrayList<Text> array) {
+	private List<Region> generateAllSubsetRegion(String regionString , ArrayList<Text> array) {
 		Set<Set<Text>> cmb = Sets.powerSet( new HashSet<Text>( array));
 		
-		List<SetRegion> result = new ArrayList<SetRegion>();
+		List<Region> result = new ArrayList<Region>();
 		
 		Iterator itr = cmb.iterator();
 		while(itr.hasNext()) {
-			Object element = itr.next();
-			System.out.println(element);
-			System.out.println("-----------------");
+			Set<Text> element = (Set<Text>) itr.next();
 			
 			//Create Region object from element
-			//Region regionElement = 
+			Region regionElement = new Region( regionString, new ArrayList<Text>(element));
+			//System.out.println(regionElement);
+			//System.out.println("-----------------");
 			
-			//result.add(new SetRegion(element));
+			result.add(regionElement);
 		}
 		return result;
-		//List<ListRegion> a;
-	    //List<ListRegion> result = null;//new List<ListRegion>();
-	    /*cmb = Combinatorics.power(array);
-	    cmb.forEach(function(a){ 
-	        //Create a Region object from a
-	        var strRegion =regionString
-	        //Form index
-	        var indices = []
-	        a.forEach(function(posExample){
-	            indices.push(strRegion.indexOf(posExample))
-	        })
-	        var region = new Region(
-	            strRegion,   //string
-	            indices,//positive examples's index
-	            a//positive examples (which is the whole region
-	        )
-	        result.push(region)
-	    });*/
-	    //return result;
 		
 	}
 
 
 	public String toString() {
 	    String str = "";
-	    for(Region region: this.arrayOfRegions){//this.arrayOfRegions.forEach(function(region){
+	    for(Region region: this.arrayOfRegions){
 	        str = str + region.toString()+", ";
 	    }
-	    return "SetRegion(" + str + ")";
+	    return MiscUtil.escape("SetRegion(" + str + ")");
 	};
 
 	//This function turns an object instance into an object literal

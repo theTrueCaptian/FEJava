@@ -6,13 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 import program.*;
 import region.*;
 import utilsFE.*;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 /*
  * Maeda Hanafi
@@ -30,7 +35,7 @@ for (int i = 0; i < urls.size(); i++) {
 	executor.execute(worker);
 }*/
 public class N1Learn {
-	private final int NTHREDS = 10;
+	//private final int NTHREDS = 10;
 	
 	/********************************************************************************
 	 Learning Function for Merge operator: MergeLearn
@@ -50,27 +55,136 @@ public class N1Learn {
 	    /* All that parts in inRegion that we will form partitions on
 	     * This is the Y from Figure 6. Line 27
 	     */
-	    List<String> positiveTotal = Thetas.getAllPositiveExamples();
+	    List<Text> positiveTotal = Thetas.getAllPositiveExamples();
 
 	    /* Generate subsets for each region in SetRegion
 	     * (We make subsets of theta1 and theta2)
 	     */
 	    ArrayList<Region> allSubsets = (ArrayList<Region>) Thetas.generateSubsets();
-
+	    	    
 	    //Create subsets of allSubsets[], and we call this X[]
-	    //var X = generateAllSubset(allSubsets)
-
+	    ArrayList<SetRegion> X = generateAllSubset(allSubsets);
+	    
 	    //Filter and generate programs
-	    //var m = input.getRegionCount()
-	    //var filtered = filterX(X, positiveTotal, m);
+	    int m = input.getRegionCount();
+	    ArrayList<SetRegion> filtered = filterX(X, positiveTotal, m);
 
-
+	    System.out.println(filtered.size());
 	    //Learn programs for the filtered X's
 	    //learnX(filtered, document, input, positiveTotal, callback)
 	    return null;
 	}
 	
-	class SearchThread implements Runnable {
+	/* Generates X, Figure 6 Line 26
+	 * @array The array of Regions to run the powerset on
+	 * @return ArrayList of SetRegions e.g. [SetRegion(Region("proteins (600)")), SetRegion(Region("proteins (600)"), Region("proteins (102)")), ...]
+  	 */
+	private ArrayList<SetRegion> generateAllSubset(ArrayList<Region> array) {
+		
+		Set<Set<Region>> cmb = Sets.powerSet( new HashSet<Region>( array));
+		
+		ArrayList<SetRegion> result = new ArrayList<SetRegion>();
+		
+		Iterator itr = cmb.iterator();
+		while(itr.hasNext()) {
+			Set<Region> element = (Set<Region>) itr.next();
+			
+			if(!element.isEmpty() ){
+				//Create SetRegion with the Set<Region> object from element
+				SetRegion newSetRegion = new SetRegion(new ArrayList<Region>(element), null, null);
+				
+				result.add(newSetRegion);
+				//System.out.println(newSetRegion);
+			}
+		}
+		return result;
+		
+	}
+	
+	/* Given the set X, filter it based on Y, all the positive examples.  
+	 * e.g. A valid X : [SetRegion(Region("proteins(600)")), SetRegion(Region("proteins(120)")), SetRegion(Region("proteins(600)", "proteins(120)"))]
+	 * @m is the number of regions in input (from MergeLearn()), Figure 6, Line 26
+	 */
+	private ArrayList<SetRegion> filterX(ArrayList<SetRegion> X, List<Text> Y, int m){
+		ArrayList<SetRegion> filtered = new ArrayList<SetRegion>();
+		//Iterate through each SetRegion in X, and make sure that each one is valid and add it to filtered[]
+		for(int i=0; i< X.size(); i++){
+			SetRegion subset = X.get(i);
+			/* Check if the set is minimal subset WRT Y
+	         * And the number of regions in subset must be equal to the number of regions in input (from MergeLearn()), Figure 6, Line 26
+	         * And make sure that subset doesn't contain the same region multiple times
+	         * And subset must contain at least one positive example
+	         * If subset doesn't meet all the above criteria, then don't add it to filtered[]
+	         */
+			if(isMinimal(subset, Y) && m==subset.getRegionCount()
+	            && subset.isRegionsUnique() && subset.getAllPositiveExamples().size()>0){
+	            //We do the learning of subset later in learnX()
+				filtered.add(subset);
+				System.out.println(subset);
+				System.out.println("---------");
+	        }
+		}
+		
+		return filtered;
+	
+	}
+	
+	//Check if subset[] is a minimal partition of Y
+	private boolean isMinimal(SetRegion subset, List<Text> Y) {
+
+	    List<Text> subsetArray = subset.getAllPositiveExamples();
+	    boolean isMin = isMinimalPartition(subsetArray, Y);
+	    /*System.out.println("Test");
+	    System.out.println(subsetArray);
+	    //System.out.println("******");
+	    System.out.println(Y);
+	    System.out.println(isMin);
+	    System.out.println("--------------");*/
+	    
+	    return isMin;
+	}
+
+
+	//Check if set1 is a minimal subset of set2
+	private boolean isMinimalPartition(List<Text> set1, List<Text> set2Org){
+		List<Text> set2 = new ArrayList<Text>(set2Org);
+		//System.out.println(set1.size());
+		//System.out.println(set2.size());
+		if(set2.size()<set1.size()){ //If set1 is bigger, then there is no way set2 is its superset
+	        //System.out.println("Set2 is smaller than set1");
+	    	return false;
+	    }
+	    //Loop through set1(the smaller set)
+	    for(int j=0; j<set1.size(); j++){
+	        //Find the elem1's match in set2, let's call this elem2
+	        final Text elem1 = set1.get(j);
+	        
+	        //Find elem1 from set2
+	        int find = Iterables.indexOf(set2, new Predicate<Text>() {
+	            public boolean apply(Text elem2) {
+	            	return elem1.isEqual(elem2) || elem1.isSubstring(elem2);//set2Elem.indexOf(elem1)!=-1 ;//
+	            }
+	        });
+	            
+	        if(find!=-1  ){
+	            /* The elem1 is found in set2, remove it
+	             * Remove elem2 from set2 (because it has already been counted)
+	             */
+	            //set2.splice(find, 1)
+	        	//System.out.println("FOUND elem1 in set2: "+set2.get(find));
+	        	set2.remove(find);
+	        	//System.out.println(set2);
+	        }else if(find==-1){  //If there exists an element in set1 that doesn't exist in set2, then return with false
+	            //System.out.println("There exists an elem1 that doesn't exist in set2: "+elem1);
+	        	return false;
+	        }
+
+	    }
+	    //At this point all the checks are passed, return true
+	    return true;
+	}
+	
+	/*class SearchThread implements Runnable {
 		String executeURL, search;
 
 		public SearchThread(String executeURL, String search) {
@@ -173,5 +287,5 @@ public class N1Learn {
 			System.out.println(status);
 			return result;
 		}
-	}
+	}*/
 }
