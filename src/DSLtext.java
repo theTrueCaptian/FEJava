@@ -33,7 +33,37 @@ public class DSLtext {
 							+ "DATASET 100:\nproteins (90)\ncalories 90\nproteins (600)\n"
 							+ "DATASET 400:\nproteins (102)\ncalories 432\nproteins (324)\n");
 
-			String blueregion1 = "DATASET 200:\nproteins (01)\ncalories 20\nproteins (80)\n"
+			//String regions (ancestors)
+			Text blueregion1 = new Text("proteins (01)\ncalories 20\nproteins (80)\n", 0);
+			Text blueregion2 = new Text("proteins (90)\ncalories 90\nproteins (600)\n",0);
+			Text blueregion3 = new Text("proteins (102)\ncalories 432\nproteins (324)\n", 0);
+			
+			//A positive example
+			String pos1 = "calories 20\n";
+			
+			Region region1 = new Region(
+						blueregion1, 
+					new Integer[] { 
+						blueregion1.getText().indexOf(pos1)
+					}, new String[] { 
+							pos1
+					}, null, null
+			); 
+			Region region2 = new Region(
+					blueregion2, 
+				new Integer[] {}, new String[] {}, null, null); 
+			Region region3 = new Region(
+					blueregion3, 
+				new Integer[] {}, new String[] {}, null, null); 
+			
+			List<Region> regionList = new ArrayList<Region>();
+			regionList.add(region1);
+			regionList.add(region2);
+			regionList.add(region3);
+			
+			SetRegion input = new SetRegion(regionList, null, null);
+			
+			/*String blueregion1 = "DATASET 200:\nproteins (01)\ncalories 20\nproteins (80)\n"
 					+ "DATASET 100:\nproteins (90)\ncalories 90\nproteins (600)\n"
 					+ "DATASET 400:\nproteins (102)\ncalories 432\nproteins (324)\n";
 
@@ -60,6 +90,7 @@ public class DSLtext {
 			List<Region> regionList = new ArrayList<Region>();
 			regionList.add(region1);
 			SetRegion input = new SetRegion(regionList, null, null);
+			
 			/*SetRegion input = new SetRegion(new Region[] 
 					{ new Region(
 							blueregion1, new Integer[] { blueregion1.indexOf(pos1),

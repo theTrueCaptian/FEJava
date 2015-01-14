@@ -102,7 +102,7 @@ public class SetRegion {
 		
 		for(Region theta: this.arrayOfRegions){
 			//Create all possible subList of examples within theta
-			allSubsets.addAll( generateAllSubsetRegion(theta.getRegionString(), theta.getPositiveRegions()));
+			allSubsets.addAll( generateAllSubsetRegion(theta.getRegion(), theta.getPositiveRegions()));
 		}
 	    return allSubsets;
 		
@@ -123,10 +123,10 @@ public class SetRegion {
 	}
 
 	/*
-	 * @array is an array of positiveExamples of type String e.g. ["proteins (200)", ...]
-	 * @return 
+	 * @array is an array of positiveExamples of type String e.g. [Text("proteins (200)"), Text("protiens(102)")]
+	 * @return powerset of @array
 	 */
-	private List<Region> generateAllSubsetRegion(String regionString , ArrayList<Text> array) {
+	private List<Region> generateAllSubsetRegion(Text ancestorRegion , ArrayList<Text> array) {
 		Set<Set<Text>> cmb = Sets.powerSet( new HashSet<Text>( array));
 		
 		List<Region> result = new ArrayList<Region>();
@@ -136,10 +136,7 @@ public class SetRegion {
 			Set<Text> element = (Set<Text>) itr.next();
 			
 			//Create Region object from element
-			Region regionElement = new Region( regionString, new ArrayList<Text>(element));
-			//System.out.println(regionElement);
-			//System.out.println("-----------------");
-			
+			Region regionElement = new Region( ancestorRegion, new ArrayList<Text>(element));
 			result.add(regionElement);
 		}
 		return result;

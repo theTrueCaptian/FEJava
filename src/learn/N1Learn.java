@@ -12,6 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import program.*;
 import region.*;
@@ -23,19 +26,9 @@ import com.google.common.collect.*;
  * Maeda Hanafi
  * N1Learn.java learns N1 programs; Spawns threads
  */
-/*String URL = "http://blog.dianpelangi.com/";
-String search = "hijab";
-SearchThread mainThread = new SearchThread(URL, search);
-ArrayList<String> urls = mainThread.task(URL, search);
 
-// for every url, assign it the task (searching) to an executor
-ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
-for (int i = 0; i < urls.size(); i++) {
-	SearchThread worker = new SearchThread(urls.get(i), search);
-	executor.execute(worker);
-}*/
 public class N1Learn {
-	//private final int NTHREDS = 10;
+	private final int NTHREDS = 500;
 	
 	/********************************************************************************
 	 Learning Function for Merge operator: MergeLearn
@@ -69,9 +62,8 @@ public class N1Learn {
 	    int m = input.getRegionCount();
 	    ArrayList<SetRegion> filtered = filterX(X, positiveTotal, m);
 
-	    System.out.println(filtered.size());
 	    //Learn programs for the filtered X's
-	    //learnX(filtered, document, input, positiveTotal, callback)
+	    learnX(filtered, document, input, positiveTotal/*, callback*/);
 	    return null;
 	}
 	
@@ -94,7 +86,6 @@ public class N1Learn {
 				SetRegion newSetRegion = new SetRegion(new ArrayList<Region>(element), null, null);
 				
 				result.add(newSetRegion);
-				//System.out.println(newSetRegion);
 			}
 		}
 		return result;
@@ -120,8 +111,6 @@ public class N1Learn {
 	            && subset.isRegionsUnique() && subset.getAllPositiveExamples().size()>0){
 	            //We do the learning of subset later in learnX()
 				filtered.add(subset);
-				System.out.println(subset);
-				System.out.println("---------");
 	        }
 		}
 		
@@ -134,13 +123,7 @@ public class N1Learn {
 
 	    List<Text> subsetArray = subset.getAllPositiveExamples();
 	    boolean isMin = isMinimalPartition(subsetArray, Y);
-	    /*System.out.println("Test");
-	    System.out.println(subsetArray);
-	    //System.out.println("******");
-	    System.out.println(Y);
-	    System.out.println(isMin);
-	    System.out.println("--------------");*/
-	    
+	     
 	    return isMin;
 	}
 
@@ -148,10 +131,7 @@ public class N1Learn {
 	//Check if set1 is a minimal subset of set2
 	private boolean isMinimalPartition(List<Text> set1, List<Text> set2Org){
 		List<Text> set2 = new ArrayList<Text>(set2Org);
-		//System.out.println(set1.size());
-		//System.out.println(set2.size());
 		if(set2.size()<set1.size()){ //If set1 is bigger, then there is no way set2 is its superset
-	        //System.out.println("Set2 is smaller than set1");
 	    	return false;
 	    }
 	    //Loop through set1(the smaller set)
@@ -170,12 +150,8 @@ public class N1Learn {
 	            /* The elem1 is found in set2, remove it
 	             * Remove elem2 from set2 (because it has already been counted)
 	             */
-	            //set2.splice(find, 1)
-	        	//System.out.println("FOUND elem1 in set2: "+set2.get(find));
 	        	set2.remove(find);
-	        	//System.out.println(set2);
 	        }else if(find==-1){  //If there exists an element in set1 that doesn't exist in set2, then return with false
-	            //System.out.println("There exists an elem1 that doesn't exist in set2: "+elem1);
 	        	return false;
 	        }
 
@@ -184,108 +160,88 @@ public class N1Learn {
 	    return true;
 	}
 	
-	/*class SearchThread implements Runnable {
-		String executeURL, search;
+	//Learn programs for X
+	private void learnX(ArrayList<SetRegion> inX, GlobalDocument document, SetRegion input, List<Text> positiveTotal/*, callback*/){
+	    List<SetRegion> X = new ArrayList<SetRegion>(inX);
+	    int countClosed = 0;
 
-		public SearchThread(String executeURL, String search) {
-			this.executeURL = executeURL;
-			this.search = search;
-		}
+	    //String URL = "http://blog.dianpelangi.com/";
+	    //String search = "hijab";
+	    //N1LearnChild mainThread = new N1LearnChild(URL, search);
+	    //ArrayList<String> urls = mainThread.task(URL, search);
 
-		public void run() {
-			task(executeURL, search);
-		}
+	    // for every url, assign it the task (searching) to an executor
+	    ExecutorService executor = Executors.newFixedThreadPool(NTHREDS);
+	    ArrayList<Runnable> workers = new ArrayList<Runnable>();
+	    for (int i = 0; i < X.size(); i++) {
+	    	SetRegion setRegion = X.get(i);
+	    	N1LearnChild worker = new N1LearnChild(setRegion, document, i);
+	    	executor.execute(worker);
+	    	workers.add(worker);
+	    }
+	    //System.out.println("DONEODNOE");
+	    executor.shutdown(); // Disable new tasks from being submitted
+	    try {
+	      // Wait a while for existing tasks to terminate
+	      if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+	    	  executor.shutdownNow(); // Cancel currently executing tasks
+	        // Wait a while for tasks to respond to being cancelled
+	        if (!executor.awaitTermination(60, TimeUnit.SECONDS))
+	            System.err.println("Pool did not terminate");
+	      }
+	    } catch (InterruptedException ie) {
+	      // (Re-)Cancel if current thread also interrupted
+	    	executor.shutdownNow();
+	      // Preserve interrupt status
+	      Thread.currentThread().interrupt();
+	    } 
+	    
+	    for (int i = 0; i < workers.size(); i++) {
+	    	System.out.println(((N1LearnChild) workers.get(i)).getID());
+	    }
+	    //Holds all the subsets along with the
+	    /*var globalX = []
 
-		public ArrayList<String> task(String URL, String search) {
-			// each content in arraylist is a line of string from the html file
-			ArrayList<String> fileContent = grabFile(URL);
-			// search all occurrences of that search string
-			System.out.println("Parsing " + URL);
-			ArrayList<String> urlList = parseFile(URL, fileContent, search);
-			return urlList;
-		}
+	    for(var i=0; i< X.length; i++) {
+	        console.log("Spawning child number:"+i)
+	        var fork = require('child_process').fork;
 
-		// this method takes in the file content and prints out the occurences
-		// of search string
-		// this also returns an arraylist of urls in the page
-		private ArrayList<String> parseFile(String userURL,
-				ArrayList<String> fileContent, String search) {
-			ArrayList<String> urlList = new ArrayList<String>();
-			// for loop in each line(content of the arraylist)
-			for (int i = 0; i < fileContent.size(); i++) {
-				// use String.split to split the line and find if there are
-				// occurences
-				String[] tokenLine = fileContent.get(i).split("\\s");
-				for (int j = 0; j < tokenLine.length; j++) {
-					// this if statement checks for search string occurrence
-					if (tokenLine[j].matches(search + ".*")) {
-						System.out.println("Occurence of " + search
-								+ " in line " + (i + 1) + " in URL:"
-								+ executeURL);
-					}
-					// this statement checks if there is http
-					if (tokenLine[j].matches("href=\"/.*")
-							|| tokenLine[j].matches("href=\"http.*")) {
-						// add to urlList
-						urlList.add(cleanURL(userURL, tokenLine[j]));
-					}
-				}
-			}
-			return urlList;
-		}
+	        var kid = fork(__dirname + '/N1LearnChild.js');
 
-		// gets only the url in between the quotes
-		public String cleanURL(String URL, String dirtyURL) {
-			try {
-				String extract = dirtyURL.split("\"")[1];
-				// append url website if needed
-				if (!extract.matches("http.*"))
-					extract = URL + extract;
-				return extract;
-			} catch (ArrayIndexOutOfBoundsException ex) {
-				String extract = dirtyURL.split("\"")[0];
-				// append url website if needed
-				if (!extract.matches("http.*"))
-					extract = URL + extract;
-				return extract;
-			}
+	        kid.on('message', function(response) {
+	            var setRegion = Converter.convertToSetRegion(response)
+	            //console.log(setRegion)
+	            //If it is empty set returned, then remove the subset too
+	            if (!Util.isEmpty(setRegion.getProgramsN1())) {
+	                globalX.push(setRegion)
+	            }
+	            // globalX.push(response)
 
-		}
+	            Util.logLearn("-----")
 
-		private ArrayList<String> grabFile(String URLSTRING) {
-			// Declare buffered stream for reading text for the URL
-			BufferedReader infile = null;
-			URL url = null;
-			ArrayList<String> result = new ArrayList<String>();
-			String status = "";
-			try {
-				// Obtain URL
-				url = new URL(URLSTRING);
 
-				// Create a buffered stream
-				InputStream is = url.openStream();
-				infile = new BufferedReader(new InputStreamReader(is));
+	        });
 
-				String inLine;
-				// Read a line and append the line to the arraylist
-				while ((inLine = infile.readLine()) != null) {
-					result.add(inLine + '\n');
-				}
+	        // Listen for an exit event:
+	        kid.on('exit', function (exitCode) {
+	            console.log("Child exited with code: " + exitCode);
 
-				status = ("File loaded successfully");
-			} catch (FileNotFoundException e) {
-				status = ("URL " + url + " not found.");
-			} catch (IOException e) {
-				status = e.getMessage();
-			} finally {
-				try {
-					if (infile != null)
-						infile.close();
-				} catch (IOException ex) {
-				}
-			}
-			System.out.println(status);
-			return result;
-		}
-	}*/
+	            ///Determine whether all Children have been killed in order to Learn Merge
+	            countClosed++
+	            if(countClosed== X.length) {
+	                console.log("All killed")
+	                contMerge(globalX, document, input, positiveTotal, callback)
+	            }
+	        });
+	        var subset = X[i]
+
+	        //Send information to N1Learn
+	        kid.send({'SetRegion': subset.obj(), 'document':document.obj(), 'id':i});
+
+
+	    }*/
+
+	}
+
+	
 }
