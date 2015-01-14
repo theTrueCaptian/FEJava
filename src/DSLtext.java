@@ -109,9 +109,9 @@ public class DSLtext {
 		MiscUtil.logLearn("Learning Started!");
 		// var programs = []
 		if (isCallN2Learn(input)) {
-			/*
-			 * Program[] learnedProgs = N2Learn.SynthesizeRegionProg(input);
-			 * MiscUtil.logLearn("Learning Ended!");
+			
+			ArrayList<?> learnedProgs = new N2Learn().SynthesizeRegionProg(input);
+			 /* MiscUtil.logLearn("Learning Ended!");
 			 * 
 			 * MiscUtil.logLearn("Done Learning!");
 			 * 

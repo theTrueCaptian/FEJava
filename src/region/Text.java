@@ -22,6 +22,10 @@ public class Text {
 		return text;
 	}
 	
+	public int length(){
+		return this.text.length();
+	}
+	
 	public int getPosition(){
 		return position;
 	}
@@ -43,5 +47,10 @@ public class Text {
 		return this.text.indexOf(comp.getText())!=-1 || 
 				(comp.getPosition()>=this.position &&
 				comp.getPosition()<=(this.position+this.text.length()));
+	}
+	
+	//Return the index at which the incoming Text appears within this text
+	public int indexOf(Text intext){
+		return this.text.indexOf(intext.getText());
 	}
 }

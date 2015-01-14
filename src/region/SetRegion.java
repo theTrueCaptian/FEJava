@@ -52,14 +52,14 @@ public class SetRegion {
 	/* Given a program, run it on the regions
 	 * @isDividedByLines indicate if the regions must be divided by lines before the program runs on it
 	 */
-	public List<String> run(Program program, boolean isDividedByLines){
-	    List<String> results = new ArrayList<String>();
+	public List<Text> run(Program program, boolean isDividedByLines){
+	    List<Text> results = new ArrayList<Text>();
 	    for(Region region: this.arrayOfRegions){
 	    	if(isDividedByLines){
-	    		List<String> regionResult = program.executeLines(region.getRegionLines());
-	    	    results.addAll(regionResult);
+	    		//List<Text> regionResult = program.executeLines(region.getRegion());
+	    	    //results.addAll(regionResult);
 	    	}else{
-	            results.addAll(program.execute(region.getRegionString()));
+	            results.addAll(program.execute(region.getRegion()));
 
 	    	}
 	    }

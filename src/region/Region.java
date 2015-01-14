@@ -112,10 +112,10 @@ public class Region {
 	public ArrayList<Integer> getNegativeIndices() {
 		return this.positiveRegionIndices;
 	}
-
-	// Returns the index'th positive regions in string
-	public String getPositiveRegionsStringAt(int index) {
-		return this.positiveRegionsString.get(index);
+*/
+	// Returns the index'th positive regions in Text
+	public Text getPositiveRegionsAt(int index) {
+		return this.positiveRegions.get(index);
 	}
 
 	/*
