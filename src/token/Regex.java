@@ -8,6 +8,8 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import utilsFE.*;
+
 /********************************************************************************
 	Regex/regex Generator Classes
 ********************************************************************************/
@@ -25,6 +27,8 @@ public class Regex {
 	private String[] allTokens = {"[0-9]+", "[a-zA-Z]+", "[a-z]+", "[A-Z]+", "[\\u00C0-\\u00FF]+", "[0-9a-zA-Z]+", "[\\s]+" ,
 			"[^0-9]+", "[^a-zA-Z]+", "[^a-z]+", "[^A-Z]+", "[^\\u00C0-\\u00FF]+", "[^0-9a-zA-Z]+", "[^\\s]+",
 			"^", "$", "-", "\\.", ";", ":", ",", "\\\\", "\\/", "{", "}", "\\(", "\\)", "\\]", "\\[" };
+	//According to Gulwani's paper
+	private int TOKEN_CLASS_LIMIT = 3;
 	
 	public Regex(){
 		generateRegex();
@@ -39,10 +43,14 @@ public class Regex {
 		lregex.addAll( processSubsets( f, 1 ));
 		lregex.addAll( processSubsets( f, 2 ));
 		lregex.addAll( processSubsets( f, 3 ));
-		/*GeneratePermutations g = new GeneratePermutations();
-		ArrayList<String> permutations = g.generatePermutations(allTokens);
-*/
-        for ( List<String> s : lregex)
+		//GeneratePermutations g = new GeneratePermutations();
+		//ArrayList<String> permutations = g.generatePermutations(lregex);
+
+		//List<String> f = Lists.newArrayList( "A", "B", "C", "D" );
+	    PermutationsOfN<List<String>> g = new PermutationsOfN<List<String>>();
+	    g.processSubsets( lregex, TOKEN_CLASS_LIMIT );
+	    
+	    for ( List<String> s : lregex)
         {
             this.regex.add(new TokenSeq(s));
         }

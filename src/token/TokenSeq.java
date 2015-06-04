@@ -1,7 +1,7 @@
 package token;
 
 import java.util.List;
-
+import java.lang.StringBuilder;
 /********************************************************************************
 //Define the tokenSeq constructor
 //Holds an array of tokens
